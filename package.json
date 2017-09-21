@@ -1,0 +1,30 @@
+{
+  "name": "ampcidapi",
+  "version": "1.0.0",
+  "description": "AMP Client ID Library",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo 'var self = {};' > test.tmp.js; cat index.js test.js >> test.tmp.js; node_modules/mocha/bin/mocha test.tmp.js",
+    "server": "./node_modules/http-server/bin/http-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/google/amp-client-id-library.git"
+  },
+  "keywords": [
+    "AMP"
+  ],
+  "author": "AMP team",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/google/amp-client-id-library/issues"
+  },
+  "homepage": "https://github.com/google/amp-client-id-library#readme",
+  "devDependencies": {
+    "chai": "3.5.0",
+    "http-server": "0.10.0",
+    "mocha": "2.5.3",
+    "sinon": "1.17.7",
+    "sinon-chai": "2.8.0"
+  }
+}
