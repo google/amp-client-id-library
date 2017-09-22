@@ -34,6 +34,13 @@ var PROXY_ORIGIN_URL_REGEX =
 
 var scopedCidCallbacks = {};
 
+/**
+ * Gets scoped CID (client ID).
+ *
+ * @param {string} scope
+ * @param {string} apiKey
+ * @param {function} callback
+ */
 function getScopedCid(scope, apiKey, callback) {
   if (scopedCidCallbacks[scope]) {
     scopedCidCallbacks[scope].push(callback);
@@ -74,6 +81,14 @@ function getScopedCid(scope, apiKey, callback) {
   });
 }
 
+/**
+ * Fetches CID remotely
+ *
+ * @param {string} url
+ * @param {string} scope
+ * @param {string=} token
+ * @param callback
+ */
 function fetchCid(url, scope, token, callback) {
   var payload = {'originScope': scope};
   if (token) {
@@ -96,6 +111,13 @@ function fetchCid(url, scope, token, callback) {
   });
 }
 
+/**
+ * Wraps an array of callback functions, so that all of them are invoked
+ * together.
+ *
+ * @param {Array<function>} callbacks
+ * @returns {function}
+ */
 function wrapCallbacks(callbacks) {
   return function () {
     var args = arguments;
@@ -105,20 +127,44 @@ function wrapCallbacks(callbacks) {
   };
 }
 
+/**
+ * Stores the given token value into a cookie with name of `AMP_TOKEN`.
+ *
+ * @param {string} tokenValue
+ * @param {number} expires
+ */
 function persistToken(tokenValue, expires) {
   if (tokenValue) {
     setCookie(AMP_TOKEN, tokenValue, Date.now() + expires);
   }
 }
 
+/**
+ * Checks if the document referrer is proxy origin.
+ *
+ * @returns {boolean}
+ */
 function isReferrerProxyOrigin() {
   return PROXY_ORIGIN_URL_REGEX.test(self.document.referrer);
 }
 
+/**
+ * Returns if the AMP_TOKEN contains a value that indicates a special state.
+ *
+ * @param {string} token
+ * @returns {boolean}
+ */
 function isStatusToken(token) {
-  return token && token[0] === '$';
+  return !!token && (token[0] === '$');
 }
 
+/**
+ * Polls with the given time interval until the provided `predicate` is `true`.
+ *
+ * @param {number} delay
+ * @param {function} predicate
+ * @param {function} callback
+ */
 function poll(delay, predicate, callback) {
   var interval = self.setInterval(function () {
     if (predicate()) {
@@ -128,6 +174,12 @@ function poll(delay, predicate, callback) {
   }, delay);
 }
 
+/**
+ * Gets cookie value. Returns `null` if not exists.
+ *
+ * @param {string} name
+ * @returns {?string}
+ */
 function getCookie(name) {
   var cookies = self.document.cookie.split(';');
   for (var i = 0; i < cookies.length; i++) {
@@ -143,11 +195,26 @@ function getCookie(name) {
   return null;
 }
 
+/**
+ * Sets cookie.
+ *
+ * @param {string} name
+ * @param {string} value
+ * @param {number} expirationTime
+ */
 function setCookie(name, value, expirationTime) {
   self.document.cookie = encodeURIComponent(name) + '=' + encodeURIComponent(value) +
       '; path=/; expires=' + new Date(expirationTime).toUTCString();
 }
 
+/**
+ * Fetch a JSON object from a remote endpoint using a POST XHR request.
+ *
+ * @param {string} url
+ * @param {Object} payload
+ * @param {number} timeout
+ * @param {function} callback
+ */
 function fetchJson(url, payload, timeout, callback) {
   var oneTimeCallback = oneTime(callback);
   self.setTimeout(function () {
@@ -187,6 +254,12 @@ function fetchJson(url, payload, timeout, callback) {
   xhr.send(JSON.stringify(payload));
 }
 
+/**
+ * Creates a POST XHR.
+ *
+ * @param {string} url
+ * @returns {XMLHttpRequest|XDomainRequest}
+ */
 function createPostXhrRequest(url) {
   var xhr = new self.XMLHttpRequest();
   if ('withCredentials' in xhr) {
@@ -204,6 +277,12 @@ function createPostXhrRequest(url) {
   return xhr;
 }
 
+/**
+ * Wraps a callback so that it will only be invoked once.
+ *
+ * @param {function} callback
+ * @returns {function}
+ */
 function oneTime(callback) {
   var called = false;
   return function () {
