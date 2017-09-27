@@ -63,7 +63,7 @@ The recommended integration of the Google AMP Client ID library is to use binary
 The  Google AMP Client ID library uses the `AMP_TOKEN` cookie to store information. This cookie serves two purposes:
 
 1. To persist a security token that is received from the API server, which can be used to exchange CID values next time.
-2.  To act as a lock so that no concurrent requests are being sent.
+2. To act as a lock so that no concurrent requests are being sent.
 
 
 ## Testing
