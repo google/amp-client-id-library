@@ -39,7 +39,7 @@ var scopedCidCallbacks = {};
  *
  * @param {string} scope
  * @param {string} apiKey
- * @param {function} callback
+ * @param {function()} callback
  */
 function getScopedCid(scope, apiKey, callback) {
   if (scopedCidCallbacks[scope]) {
@@ -87,7 +87,7 @@ function getScopedCid(scope, apiKey, callback) {
  * @param {string} url
  * @param {string} scope
  * @param {string=} token
- * @param callback
+ * @param {function()} callback
  */
 function fetchCid(url, scope, token, callback) {
   var payload = {'originScope': scope};
@@ -115,8 +115,8 @@ function fetchCid(url, scope, token, callback) {
  * Wraps an array of callback functions, so that all of them are invoked
  * together.
  *
- * @param {Array<function>} callbacks
- * @returns {function}
+ * @param {Array<function()>} callbacks
+ * @returns {function()}
  */
 function wrapCallbacks(callbacks) {
   return function () {
