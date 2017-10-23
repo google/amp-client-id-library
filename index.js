@@ -86,7 +86,7 @@ function getScopedCid(scope, apiKey, callback) {
  *
  * @param {string} apiKey
  * @param {string} scope
- * @param {string=} token
+ * @param {?string} token
  * @param {function()} callback
  */
 function fetchCid(apiKey, scope, token, callback) {
@@ -96,10 +96,7 @@ function fetchCid(apiKey, scope, token, callback) {
   }
   const url = GOOGLE_API_URL + apiKey;
   fetchJson(url, payload, TIMEOUT, function (err, res) {
-    if (err) {
-      persistToken(TokenStatus.ERROR, TIMEOUT);
-      callback(err);
-    } else if (res['alternateUrl']) {
+    if (!err && res['alternateUrl']) {
       // Try again with alternateUrl
       const altUrl = `${res['alternateUrl']}?key=${apiKey}`;
       fetchJson(altUrl, payload, TIMEOUT, function (err, res) {
@@ -113,7 +110,7 @@ function fetchCid(apiKey, scope, token, callback) {
 
 /**
  *
- * @param {Error} err
+ * @param {?Error} err
  * @param {!JsonObject} res
  * @param {function()} callback
  */
