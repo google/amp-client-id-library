@@ -88,40 +88,74 @@ describe('Test cid.js', function() {
     });
   });
 
-    it('Should respect API responding alternateUrl', function(done) {
-      setToken('token-54321');
-      var callbackSpy = sinon.spy();
-      ampCidApiOnload(function(api) {
-        api.getScopedCid('scope-abc', 'key-123', callbackSpy);
-        simulateXhrResponse({
-          alternateUrl: 'https://ampcid.google.co.uk/v1/publisher:getClientId'
-        });
-        expect(xhrs[0].withCredentials).to.be.true;
-        expect(xhrs[0].method).to.equal('POST');
-        expect(xhrs[0].url).to.equal(
-            'https://ampcid.google.com/v1/publisher:getClientId?key=key-123');
-        expect(xhrs[0].payload).to.equal(JSON.stringify({
-          'originScope': 'scope-abc',
-          'securityToken': 'token-54321'
-        }));
-        expect(xhrs).to.have.length(2);
-        expect(callbackSpy).to.not.be.called;
-        expect(xhrs[1].withCredentials).to.be.true;
-        expect(xhrs[1].method).to.equal('POST');
-        expect(xhrs[1].url).to.equal(
-            'https://ampcid.google.co.uk/v1/publisher:getClientId?key=key-123');
-        expect(xhrs[1].payload).to.equal(JSON.stringify({
-          'originScope': 'scope-abc',
-          'securityToken': 'token-54321'
-        }));
-        simulateXhrResponse({
-          clientId: 'amp-cid-abc-4321'
-        }, 1);
-        expect(callbackSpy).to.be.calledOnce;
-        expect(callbackSpy).to.be.calledWith(null, 'amp-cid-abc-4321');
-        done();
+  it('Should respect API responding alternateUrl if no AMP_TOKEN exists', function(done) {
+    var callbackSpy = sinon.spy();
+    ampCidApiOnload(function(api) {
+      api.getScopedCid('scope-abc', 'key-123', callbackSpy);
+      simulateXhrResponse({
+        alternateUrl: 'https://ampcid.google.co.uk/v1/publisher:getClientId'
       });
+      expect(xhrs[0].withCredentials).to.be.true;
+      expect(xhrs[0].method).to.equal('POST');
+      expect(xhrs[0].url).to.equal(
+          'https://ampcid.google.com/v1/publisher:getClientId?key=key-123');
+      expect(xhrs[0].payload).to.equal(JSON.stringify({
+        'originScope': 'scope-abc',
+      }));
+      expect(xhrs).to.have.length(2);
+      expect(callbackSpy).to.not.be.called;
+      expect(xhrs[1].withCredentials).to.be.true;
+      expect(xhrs[1].method).to.equal('POST');
+      expect(xhrs[1].url).to.equal(
+          'https://ampcid.google.co.uk/v1/publisher:getClientId?key=key-123');
+      expect(xhrs[1].payload).to.equal(JSON.stringify({
+        'originScope': 'scope-abc',
+      }));
+      simulateXhrResponse({
+        securityToken: 'token-12345',
+        clientId: 'amp-cid-abc-4321',
+      }, 1);
+      expect(getToken()).to.equal('token-12345');
+      expect(callbackSpy).to.be.calledOnce;
+      expect(callbackSpy).to.be.calledWith(null, 'amp-cid-abc-4321');
+      done();
     });
+  });
+
+  it('Should respect API responding alternateUrl if AMP_TOKEN exists', function(done) {
+    setToken('token-54321');
+    var callbackSpy = sinon.spy();
+    ampCidApiOnload(function(api) {
+      api.getScopedCid('scope-abc', 'key-123', callbackSpy);
+      simulateXhrResponse({
+        alternateUrl: 'https://ampcid.google.co.uk/v1/publisher:getClientId'
+      });
+      expect(xhrs[0].withCredentials).to.be.true;
+      expect(xhrs[0].method).to.equal('POST');
+      expect(xhrs[0].url).to.equal(
+          'https://ampcid.google.com/v1/publisher:getClientId?key=key-123');
+      expect(xhrs[0].payload).to.equal(JSON.stringify({
+        'originScope': 'scope-abc',
+        'securityToken': 'token-54321'
+      }));
+      expect(xhrs).to.have.length(2);
+      expect(callbackSpy).to.not.be.called;
+      expect(xhrs[1].withCredentials).to.be.true;
+      expect(xhrs[1].method).to.equal('POST');
+      expect(xhrs[1].url).to.equal(
+          'https://ampcid.google.co.uk/v1/publisher:getClientId?key=key-123');
+      expect(xhrs[1].payload).to.equal(JSON.stringify({
+        'originScope': 'scope-abc',
+        'securityToken': 'token-54321'
+      }));
+      simulateXhrResponse({
+        clientId: 'amp-cid-abc-4321'
+      }, 1);
+      expect(callbackSpy).to.be.calledOnce;
+      expect(callbackSpy).to.be.calledWith(null, 'amp-cid-abc-4321');
+      done();
+    });
+  });
 
   it('Should respect API responding OPT_OUT', function(done) {
     var callbackSpy = sinon.spy();
