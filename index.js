@@ -77,38 +77,57 @@ function getScopedCid(scope, apiKey, callback) {
     if (!token || isStatusToken(token)) {
       persistToken(TokenStatus.RETRIEVING, TIMEOUT);
     }
-    fetchCid(GOOGLE_API_URL + apiKey, scope, token, cb)
+    fetchCid(apiKey, scope, token, cb)
   });
 }
 
 /**
  * Fetches CID remotely
  *
- * @param {string} url
+ * @param {string} apiKey
  * @param {string} scope
- * @param {string=} token
+ * @param {?string} token
  * @param {function()} callback
  */
-function fetchCid(url, scope, token, callback) {
+function fetchCid(apiKey, scope, token, callback) {
   var payload = {'originScope': scope};
   if (token) {
     payload['securityToken'] = token;
   }
+  const url = GOOGLE_API_URL + apiKey;
   fetchJson(url, payload, TIMEOUT, function (err, res) {
-    if (err) {
-      persistToken(TokenStatus.ERROR, TIMEOUT);
-      callback(err);
-    } else if (res['optOut']) {
-      persistToken(TokenStatus.OPT_OUT, YEAR);
-      callback(null, TokenStatus.OPT_OUT);
-    } else if (res['clientId']) {
-      persistToken(res['securityToken'], YEAR);
-      callback(null, res['clientId']);
+    if (!err && res['alternateUrl']) {
+      // Try again with alternateUrl
+      const altUrl = `${res['alternateUrl']}?key=${apiKey}`;
+      fetchJson(altUrl, payload, TIMEOUT, function (err, res) {
+        handleResponse(err, res, callback);
+      });
     } else {
-      persistToken(TokenStatus.NOT_FOUND, HOUR);
-      callback(null, null);
+      handleResponse(err, res, callback);
     }
   });
+}
+
+/**
+ *
+ * @param {?Error} err
+ * @param {!JsonObject} res
+ * @param {function()} callback
+ */
+function handleResponse(err, res, callback) {
+  if (err) {
+    persistToken(TokenStatus.ERROR, TIMEOUT);
+    callback(err);
+  } else if (res['optOut']) {
+    persistToken(TokenStatus.OPT_OUT, YEAR);
+    callback(null, TokenStatus.OPT_OUT);
+  } else if (res['clientId']) {
+    persistToken(res['securityToken'], YEAR);
+    callback(null, res['clientId']);
+  } else {
+    persistToken(TokenStatus.NOT_FOUND, HOUR);
+    callback(null, null);
+  }
 }
 
 /**
