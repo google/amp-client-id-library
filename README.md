@@ -1,3 +1,5 @@
+**NOTE: The library below is intended to be used in conjuction with the yet-to-be-released AMP Client ID API for custom integrations. Code and JavaScript libraries below aren't useful yet. If you want to use the AMP Client ID API in conjuction with Google Analytics, please consult the [documentation for the AMP Client ID API in Google Analytics](https://support.google.com/analytics/answer/7486764).**
+
 # Google AMP Client ID Library
 
 This Google AMP Client ID library provides a script that you can use to integrate the [Google AMP Client ID API](https://developers.google.com/amp/client-id/) in your non-AMP pages for custom analytic systems (i.e., for in-house analytics tracking or for analytics vendors that are not [preconfigured for use with the API](https://developers.google.com/amp/client-id/vendor). The Google AMP Client ID API provides you with the ability to consistently track users across AMP and non-AMP pages.
